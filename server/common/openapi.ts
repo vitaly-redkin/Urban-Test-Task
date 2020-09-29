@@ -1,3 +1,6 @@
+/**
+ * Open API validator.
+ */
 import * as path from 'path';
 import express, { Application } from 'express';
 import errorHandler from '../api/middlewares/error.handler';

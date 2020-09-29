@@ -11,6 +11,9 @@ import installValidator from './openapi';
 const app = express();
 const exit = process.exit;
 
+/**
+ * Express Server class.
+ */
 export default class ExpressServer {
   private routes: (app: Application) => void;
   constructor() {

@@ -1,4 +1,4 @@
-# server2
+# Urban Geo Locator
 
 Urban Test Task Server
 
