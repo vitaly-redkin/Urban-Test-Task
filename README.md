@@ -8,16 +8,18 @@ Get started developing...
 
 ```shell
 # install deps
-npm install
+yarn install
 
 # run in development mode
-npm run dev
+yarn run dev
 
 # run tests
-npm run test
+yarn run test
 ```
 
 ---
+
+https://github.com/cdimascio/generator-express-no-stress-typescript
 
 ## How do I modify the example API and make it my own?
 
