@@ -2,6 +2,7 @@ import L from '../../common/logger';
 
 import { getCordinatesByAddress } from '../geocoding';
 import { IGeoCodingResult } from '../geocoding/GeoGodingProvider';
+import { cacheGet, cacheSet, cacheComposeKey } from '../../util/CacheManager';
 
 /**
  * Interface for geo location results.
@@ -33,24 +34,38 @@ export class GeoLocatorService {
     L.info(`Search ${search} for "${address}"...`);
 
     try {
-      const gcr: IGeoCodingResult = await getCordinatesByAddress(address);
-      const serviceArea = '111'; // TO DO
-      const result: IResponse = {
-        status: 'OK',
-        search,
-        location: {
-          ...gcr,
-          serviceArea,
-        },
-      };
+      const cacheKey: string = cacheComposeKey('geo-locator.locate', address);
+      let result: IResponse | undefined = cacheGet<IResponse>(cacheKey);
+      if (!result || result.status === 'ERROR') {
+        const gcr: IGeoCodingResult = await getCordinatesByAddress(address);
+        const serviceArea = '111'; // TO DO
+        result = {
+          status: 'OK',
+          search,
+          location: {
+            ...gcr,
+            serviceArea,
+          },
+        };
 
-      L.info(
-        `Search ${search} for "${address}" completed: ${JSON.stringify(
-          result,
-          null,
-          2
-        )}`
-      );
+        cacheSet<IResponse>(cacheKey, result);
+
+        L.info(
+          `Search ${search} for "${address}" completed: ${JSON.stringify(
+            result,
+            null,
+            2
+          )}`
+        );
+      } else {
+        L.info(
+          `Search ${search} for "${address}" found in cache: ${JSON.stringify(
+            result,
+            null,
+            2
+          )}`
+        );
+      }
 
       return Promise.resolve(result);
     } catch (e) {

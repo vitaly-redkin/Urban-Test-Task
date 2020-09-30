@@ -17,7 +17,7 @@ paths:
       - GeoLocation
       description: Finds service areф, address and coordinates by user-entered address
       parameters:
-      - name: seacrh
+      - name: search
         in: query
         description: search ID
         required: true
