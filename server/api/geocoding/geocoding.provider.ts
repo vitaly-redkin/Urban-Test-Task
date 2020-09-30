@@ -1,5 +1,5 @@
 /**
- * Interface for the coding (address -> coordinates) operation result.
+ * Interface for the geo coding (address -> coordinates) operation result.
  */
 export interface IGeoCodingResult {
   address: string; // Full address (as returned by tge Geo Coding provider)

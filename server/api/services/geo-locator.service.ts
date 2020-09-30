@@ -1,8 +1,8 @@
 import L from '../../common/logger';
-
 import { getCordinatesByAddress } from '../geocoding';
-import { IGeoCodingResult } from '../geocoding/GeoGodingProvider';
-import { cacheGet, cacheSet, cacheComposeKey } from '../../util/CacheManager';
+import { IGeoCodingResult } from '../geocoding/geocoding.provider';
+import { cacheGet, cacheSet, cacheComposeKey } from '../../util/cache-manager';
+import { findDistrict } from '../district-finder/district-finder';
 
 /**
  * Interface for geo location results.
@@ -15,7 +15,7 @@ interface IResponse {
   // Location - as resolved by geo coding servoice plus the service area
   location?: IGeoCodingResult & {
     // Service area - the result of our search for the address
-    serviceArea: string;
+    serviceArea?: string;
   };
 }
 
@@ -38,15 +38,26 @@ export class GeoLocatorService {
       let result: IResponse | undefined = cacheGet<IResponse>(cacheKey);
       if (!result || result.status === 'ERROR') {
         const gcr: IGeoCodingResult = await getCordinatesByAddress(address);
-        const serviceArea = '111'; // TO DO
-        result = {
-          status: 'OK',
-          search,
-          location: {
-            ...gcr,
-            serviceArea,
-          },
-        };
+
+        const serviceArea: string | null = findDistrict(gcr);
+        if (serviceArea) {
+          result = {
+            status: 'OK',
+            search,
+            location: {
+              ...gcr,
+              serviceArea,
+            },
+          };
+        } else {
+          result = {
+            status: 'NOT_FOUND',
+            search,
+            location: {
+              ...gcr,
+            },
+          };
+        }
 
         cacheSet<IResponse>(cacheKey, result);
 
@@ -69,6 +80,8 @@ export class GeoLocatorService {
 
       return Promise.resolve(result);
     } catch (e) {
+      L.error(e);
+
       // Return error status for the search
       return {
         status: 'ERROR',

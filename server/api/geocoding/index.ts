@@ -1,8 +1,8 @@
 /**
  * Module "root" file to contain the entry point and the list of providers.
  */
-import { IGeoCodingResult, GeoCodigException } from './GeoGodingProvider';
-import { GoogleMapsProvider } from './GoogleMapsProvider';
+import { IGeoCodingResult, GeoCodigException } from './geocoding.provider';
+import { GoogleMapsProvider } from './google-maps.provider';
 
 import '../../common/env';
 import L from '../../common/logger';

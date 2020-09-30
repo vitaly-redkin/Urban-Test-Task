@@ -4,7 +4,8 @@ import {
   GeoCodingProvider,
   IGeoCodingResult,
   GeoCodigException,
-} from './GeoGodingProvider';
+} from './geocoding.provider';
+import { fixedEncodeURIComponent } from '../../util/util';
 
 /**
  * Google Maps implemetation of the Geo Provider.
@@ -28,9 +29,9 @@ export class GoogleMapsProvider extends GeoCodingProvider {
   protected async getCordinatesByAddressInt(
     addressRec: Record<string, unknown>
   ): Promise<Record<string, unknown>> {
-    const apiKey: string = encodeURIComponent(this.apiKey);
+    const apiKey: string = fixedEncodeURIComponent(this.apiKey);
     const address: string = addressRec['address'] as string;
-    const addressForUrl: string = encodeURIComponent(address);
+    const addressForUrl: string = fixedEncodeURIComponent(address);
     const url = `https://maps.googleapis.com/maps/api/geocode/json?key=${apiKey}&address=${addressForUrl}`;
 
     try {
