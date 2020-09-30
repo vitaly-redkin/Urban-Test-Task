@@ -33,6 +33,12 @@ The code structure is a bit overengineered for the task. But in the real life th
 The requirement to use several Geo Coding providers is implemented using the base (abstract) class and inheriting the "real" implementations (like Google Maps Geo Coding Provider) from this base class. Then you define the list of provider objects to be called sequentially (if the "top" provider rerurns an error). The same effect could be achieved using the FP paradigm instead of the OOP one used (i.e. every provider should include functions to prepare the address, to make the request and to exract the required data from the result) - but the classes I implemented use teh same thing with a bit less "magic".
 Also there is somewhat primitive and excessive (error) logging used - in the real app some common startegy and probably the thord party systems (like [Sentry](https://www.sentry.io) should be used.
 
+## Implementation Notes
+Google Maps Geo Coding API returns both the full address by coordinates, and the parts of it, not easily mappable to the Address1, Address2 and City fields you wanted in the result. So I decided to return the full address and the postal code (if I can find it).
+
+## Validation
+Input validation is done by the Open API using the ```api.yml``` file.
+
 ## Caching
 I implemented the caching in the service layer (i.e. in the function level) instead of the API level. I believe such approach is more flexible if you want to use the same functionality in more end points instead of the only one.
 The cache is an "in memory" one - in the real life some more advanced implementation (which used Redis, for example) should be used.
