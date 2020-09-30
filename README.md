@@ -4,8 +4,6 @@ Urban Test Task Server
 
 ## Quick Start
 
-Get started developing...
-
 ```shell
 # install deps
 yarn install
@@ -19,81 +17,28 @@ yarn run test
 
 ---
 
-https://github.com/cdimascio/generator-express-no-stress-typescript
-
-## How do I modify the example API and make it my own?
-
-There are two key files:
-1. `server/routes.js` - This references the implementation of all of your routes. Add as many routes as you like and point each route your express handler functions.
-2. `server/common/api.yaml` - This file contains your [OpenAPI spec](https://swagger.io/specification/). Describe your API here. It's recommended that you to declare any and all validation logic in this YAML. `express-no-stress-typescript`  uses [express-openapi-validator](https://github.com/cdimascio/express-openapi-validator) to automatically handle all API validation based on what you've defined in the spec.
-
-## Install Dependencies
-
-Install all package dependencies (one time operation)
-
-```shell
-npm install
-```
-
-## Run It
-#### Run in *development* mode:
-Runs the application is development mode. Should not be used in production
-
-```shell
-npm run dev
-```
-
-or debug it
-
-```shell
-npm run dev:debug
-```
-
-#### Run in *production* mode:
-
-Compiles the application and starts it in production production mode.
-
-```shell
-npm run compile
-npm start
-```
-
-## Test It
-
-Run the Mocha unit tests
-
-```shell
-npm test
-```
-
-or debug them
-
-```shell
-npm run test:debug
-```
+## General Information
+The source code has been generated using the [Yo Generator](https://github.com/cdimascio/generator-express-no-stress-typescript). It generated an empty NodeJS/Express server application with Typescript and [OpenAPI spec](https://swagger.io/specification/) support. It uses a pretty common controller/service code separation. Controller (used in the routes) defines methods to serve the end points. Services do the real job, sometimes using methods/classes from other files. Swagger specification is in the server/common/api.yml file.
 
 ## Try It
-* Open you're browser to [http://localhost:3000](http://localhost:3000)
-* Invoke the `/examples` endpoint 
+* Open you're browser to [http://localhost:3001](http://localhost:3001)
+* Invoke the `/geolocation` endpoint 
   ```shell
-  curl http://localhost:3000/api/v1/examples
+  curl http://localhost:3001/api/v1/geolocation?search=111&address=London
   ```
+* Navigate the Swagger link on the "home page" above and test the end point using Swagger
+ 
+## Notes About Code
+The code structure is a bit overengineered for the task. But in the real life this structure may make adding new features easier and separate the end point processing from the business logic.
+The requirement to use several Geo Coding providers is implemented using the base (abstract) class and inheriting the "real" implementations (like Google Maps Geo Coding Provider) from this base class. Then you define the list of provider objects to be called sequentially (if the "top" provider rerurns an error). The same effect could be achieved using the FP paradigm instead of the OOP one used (i.e. every provider should include functions to prepare the address, to make the request and to exract the required data from the result) - but the classes I implemented use teh same thing with a bit less "magic".
+Also there is somewhat primitive and excessive (error) logging used - in the real app some common startegy and probably the thord party systems (like [Sentry](https://www.sentry.io) should be used.
 
+## Caching
+I implemented the caching in the service layer (i.e. in the function level) instead of the API level. I believe such approach is more flexible if you want to use the same functionality in more end points instead of the only one.
+The cache is an "in memory" one - in the real life some more advanced implementation (which used Redis, for example) should be used.
+I cache the whole result (address -> coordinates -> service area/etc.). In your line of business you will hardly receive many requests with slightly different addresses resolving to the same coordinates - like for example the taxi services may. Plus, the service area search in the static GeoJSON file works much faster than the address -> coordinates search with the external API call, at least for the file provided.
+I considered adding a file dependency and the GeoJSON file cache - but decided aganst it (it is not like many people are doing surgical deployments with FTP anymore, and the whole NodeJS server should be stateless and quickly restartable anyway).
 
-## Debug It
+## Configuration
+```.env``` file (not added to Git) and ```end.SAMPLE``` file (the template to create a real one). Please replace the ```GOOGLE_MAPS_API_KEY``` value with your own key or at least do not abuse my one.
 
-#### Debug the server:
-
-```
-npm run dev:debug
-```
-
-#### Debug Tests
-
-```
-npm run test:debug
-```
-
-#### Debug with VSCode
-
-Add these [contents](https://github.com/cdimascio/generator-express-no-stress/blob/next/assets/.vscode/launch.json) to your `.vscode/launch.json` file
